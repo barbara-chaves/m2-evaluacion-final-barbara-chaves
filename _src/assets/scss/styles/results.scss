@@ -1,0 +1,35 @@
+.main {
+    display: flex;
+    flex-flow: row-reverse wrap;
+    justify-content: space-between;
+    .search {
+        flex-basis: 100%;
+    }
+    .result {
+        width: 70vw;
+        &-list {
+            display: flex;
+            flex-direction: column;
+            &-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }   
+        }
+    }
+
+    .favorite {
+        width: 30vw;
+    }
+}
+
+.js-normal{
+    background-color: pink;
+    color: red;
+            
+}
+
+.js-favorite {
+    background-color: red;
+    color: pink;
+}
