@@ -20,7 +20,6 @@ const getDataFromServer = () => {
 };
 
 const setSerieAsFavorite = () => {
-  console.log(dataList);
     for (const serie of dataList) {
       for (let fav = 0; fav < favoritList.length; fav++) {
         if (serie.id === favoritList[fav].id) {
@@ -32,17 +31,14 @@ const setSerieAsFavorite = () => {
 
 
 const saveData = data => {
-  console.log(dataList);
   for (const serie of data) {
     if (serie.show.image) {
-      console.log(serie);
       dataList.push({
         name: serie.show.name,
         id: serie.show.id,
         image: serie.show.image.medium,
         favorite: false
       });
-      console.log(dataList);
     } else {
       dataList.push({
         name: serie.show.name,
@@ -57,8 +53,6 @@ const saveData = data => {
 
 const printResultSeries = () => {
   setSerieAsFavorite();
-  console.log(dataList);
-
   if (dataList) {
     for (const serie of dataList) {
       createResultElements(serie);
@@ -87,6 +81,7 @@ const createResultElements = serie => {
 
 const deletResultList = () => {
   dataList = [];
+  resultUL.innerHTML = '';
 };
 
 const searchBtn = document.querySelector("#btn-input");
@@ -94,7 +89,6 @@ const handleBtnClick = () => {
   deletResultList();
   getUserInput();
   getDataFromServer();
-  // printResultSeries();
 };
 
 searchBtn.addEventListener("click", handleBtnClick);
@@ -185,9 +179,13 @@ let favoritesItems = document.querySelectorAll(".favorites-list-item");
 
 const removeAnImageFromFavoriteList = event => {
   for (let i = 0; i < favoritList.length; i++) {
-    if (favoritList[i].id == event.currentTarget.parentElement.dataset.id) {
-      favoritList[i].favorite = false;
-      favoritList.splice(favoritList[i], 1);
+    if (favoritList[i].id === parseInt(event.currentTarget.parentElement.dataset.id)) {
+      for (let dataIndex = 0; dataIndex < dataList.length; dataIndex++){
+        if (dataList[dataIndex].id === favoritList[i].id) {
+          dataList[dataIndex].favorite = false;
+        }
+      }
+      favoritList.splice(i, 1);
     }
   }
   localStorage.setItem("favorite", JSON.stringify(favoritList));
@@ -196,6 +194,7 @@ const removeAnImageFromFavoriteList = event => {
 const handleRemoveImgClick = event => {
   removeAnImageFromFavoriteList(event);
   printSerieInFavoritesList();
+  changeSerieBG();
 };
 
 const AddEventInRemoveIcons = () => {
@@ -206,16 +205,23 @@ const AddEventInRemoveIcons = () => {
 };
 
 favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
-// clico na img -> apago elemento de favoritos -> apago da lista
 
 // Remove from favorites button
 
-const removeAllFavorites = () => {
+const removeFavoriteClass = () => {
+  for(let i = 0; i < resultListItems.length; i++){
+    console.log(resultListItems[i]);
+    resultListItems[i].classList.remove('js-favorite');
+  }
+};
+
+const handleRemoveFavoritesBTNClick = () => {
+  removeFavoriteClass();
   favoritList = [];
+  favoritesContainer.innerHTML = '';
   localStorage.setItem("favorite", JSON.stringify(favoritList));
-  printSerieInFavoritesList();
 };
 
 const removeBtn = document.querySelector("#btn-remove-favotites");
 
-removeBtn.addEventListener("click", removeAllFavorites);
+removeBtn.addEventListener("click", handleRemoveFavoritesBTNClick);
