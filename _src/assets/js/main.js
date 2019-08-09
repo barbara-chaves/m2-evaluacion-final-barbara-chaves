@@ -175,18 +175,28 @@ main.addEventListener("click", addEventInResultItems);
 // REMOVE FAVORITE
 
 let favoritesItems = document.querySelectorAll(".favorites-list-item");
-const removeImg = document.querySelectorAll("#remove-img");
 
-const removeAnImage = event => {
+const removeAnImageFromFavoriteList = event => {
   for (let i = 0; i < favoritList.length; i++) {
-    if (favoritList[i].id === event.currentTarget.dataset.id) {
-      favoritList.splice(i, 1);
+    if (favoritList[i].id == event.currentTarget.parentElement.dataset.id) {
+      favoritList[i].favorite = false;
+      favoritList.splice(favoritList[i], 1);
     }
+  }
+  localStorage.setItem("favorite", JSON.stringify(favoritList));
+};
+
+const handleRemoveImgClick = event => {
+  removeAnImageFromFavoriteList(event);
+  printSerieInFavoritesList();
+};
+
+const AddEventInRemoveIcons = () => {
+  const xImgs = document.querySelectorAll("#remove-img");
+  for (const images of xImgs) {
+    images.addEventListener("click", handleRemoveImgClick);
   }
 };
 
-const handleRemoveImgClick = event => {};
-for (const images of removeImg) {
-  images.addEventListener("click", handleRemoveImgClick);
-}
+favoritesContainer.addEventListener("click", AddEventInRemoveIcons);
 // clico na img -> apago elemento de favoritos -> apago da lista
