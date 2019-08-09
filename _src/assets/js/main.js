@@ -20,8 +20,6 @@ const setSerieAsFavorite = () => {
   for (const serie of dataList) {
     for (let fav = 0; fav < favoritList.length; fav++) {
       if (serie.id === favoritList[fav].id) {
-        console.log("datalist serie id" + serie.id);
-        console.log("fav serie id" + favoritList[fav].id);
         serie.favorite = true;
       }
     }
@@ -65,6 +63,7 @@ const resultUL = document.querySelector(".result-list");
 const createResultElements = serie => {
   const newResult = document.createElement("li");
   newResult.classList.add("result-list-item");
+  newResult.dataset.id = serie.id;
   if (serie.favorite) {
     newResult.classList.add("js-favorite");
   }
@@ -96,20 +95,24 @@ searchBtn.addEventListener("click", handleBtnClick);
 // ---FAVORITES
 
 let favoritList = JSON.parse(localStorage.getItem("favorite")) || [];
+let favoritesContainer = [];
 
 const printSerieInFavoritesList = () => {
-  const favoritesContainer = document.querySelector(".favorites");
+  favoritesContainer = document.querySelector(".favorites-list");
   favoritesContainer.innerHTML = "";
   if (JSON.parse(localStorage.getItem("favorite"))) {
     favoritList = JSON.parse(localStorage.getItem("favorite"));
     for (const serie of favoritList) {
       const newFavorite = document.createElement("li");
-      newFavorite.innerHTML = serie.element;
+      newFavorite.classList.add("favorites-list-item");
+      newFavorite.dataset.id = serie.id;
+      newFavorite.innerHTML =
+        serie.element +
+        "<img  id='remove-img' src='./assets/images/remove-favorite-img.png' alt=''>";
       favoritesContainer.appendChild(newFavorite);
     }
   }
 };
-
 printSerieInFavoritesList();
 
 const addSerieOnFavorites = resultI => {
@@ -168,3 +171,22 @@ const addEventInResultItems = () => {
 
 const main = document.querySelector(".main");
 main.addEventListener("click", addEventInResultItems);
+
+// REMOVE FAVORITE
+
+let favoritesItems = document.querySelectorAll(".favorites-list-item");
+const removeImg = document.querySelectorAll("#remove-img");
+
+const removeAnImage = event => {
+  for (let i = 0; i < favoritList.length; i++) {
+    if (favoritList[i].id === event.currentTarget.dataset.id) {
+      favoritList.splice(i, 1);
+    }
+  }
+};
+
+const handleRemoveImgClick = event => {};
+for (const images of removeImg) {
+  images.addEventListener("click", handleRemoveImgClick);
+}
+// clico na img -> apago elemento de favoritos -> apago da lista
