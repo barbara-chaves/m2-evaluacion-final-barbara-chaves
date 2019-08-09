@@ -1,9 +1,8 @@
 .result {
   font-family: $subtitleFontFamily;
-  min-height: 100vh;
+  min-height: 0vh;
   font-size: 1.5rem;
   flex-basis: 70%;
-  background-color: #f0f0f0;
   &-list {
     display: flex;
     flex-flow: row wrap;

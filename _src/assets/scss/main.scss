@@ -7,6 +7,9 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
+  background-color: $pageBGColor;
+  padding: 40px 0;
+
   .wrap {
     flex-basis: 25%;
   }
@@ -14,6 +17,10 @@
     font-family: $subtitleFontFamily;
     font-size: 2rem;
     margin-left: 30px;
+    input {
+      text-align: center;
+      font-size: 1rem;
+    }
   }
 }
 

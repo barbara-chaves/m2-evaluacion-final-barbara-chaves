@@ -8,53 +8,61 @@ const getUserInput = () => {
   return (searchSerie = userInput.value);
 };
 
-let datasFromServer = [];
+let dataList = [];
 
 const getDataFromServer = () => {
   fetch(`http://api.tvmaze.com/search/shows?q=${searchSerie}`)
     .then(response => response.json())
-    .then(data => saveData(data));
+    .then(data => {
+      saveData(data);
+      printResultSeries();
+    });
 };
 
 const setSerieAsFavorite = () => {
-  for (const serie of dataList) {
-    for (let fav = 0; fav < favoritList.length; fav++) {
-      if (serie.id === favoritList[fav].id) {
-        serie.favorite = true;
+  console.log(dataList);
+    for (const serie of dataList) {
+      for (let fav = 0; fav < favoritList.length; fav++) {
+        if (serie.id === favoritList[fav].id) {
+          serie.favorite = true;
+        }
       }
     }
-  }
 };
 
+
 const saveData = data => {
+  console.log(dataList);
   for (const serie of data) {
     if (serie.show.image) {
-      datasFromServer.push({
+      console.log(serie);
+      dataList.push({
         name: serie.show.name,
         id: serie.show.id,
         image: serie.show.image.medium,
         favorite: false
       });
+      console.log(dataList);
     } else {
-      datasFromServer.push({
+      dataList.push({
         name: serie.show.name,
         id: serie.show.id,
-        image: `https://via.placeholder.com/210x295/ffffff/666666/?text=${
-          serie.show.name
-        }`,
+        image: `https://via.placeholder.com/210x295/ffffff/666666/?text=${serie.show.name}`,
         favorite: false
       });
     }
   }
-  localStorage.setItem("result", JSON.stringify(datasFromServer));
+  return dataList;
 };
 
-let dataList = [];
 const printResultSeries = () => {
-  dataList = JSON.parse(localStorage.getItem("result"));
   setSerieAsFavorite();
-  for (const serie of dataList) {
-    createResultElements(serie);
+  console.log(dataList);
+
+  if (dataList) {
+    for (const serie of dataList) {
+      createResultElements(serie);
+    }
   }
 };
 
@@ -78,16 +86,15 @@ const createResultElements = serie => {
 };
 
 const deletResultList = () => {
-  datasFromServer = [];
+  dataList = [];
 };
 
 const searchBtn = document.querySelector("#btn-input");
-
 const handleBtnClick = () => {
   deletResultList();
   getUserInput();
   getDataFromServer();
-  printResultSeries();
+  // printResultSeries();
 };
 
 searchBtn.addEventListener("click", handleBtnClick);
@@ -170,7 +177,7 @@ const addEventInResultItems = () => {
 };
 
 const main = document.querySelector(".main");
-main.addEventListener("click", addEventInResultItems);
+main.addEventListener("mouseover", addEventInResultItems);
 
 // REMOVE FAVORITE
 
@@ -198,7 +205,7 @@ const AddEventInRemoveIcons = () => {
   }
 };
 
-favoritesContainer.addEventListener("click", AddEventInRemoveIcons);
+favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
 // clico na img -> apago elemento de favoritos -> apago da lista
 
 // Remove from favorites button
