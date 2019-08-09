@@ -200,3 +200,15 @@ const AddEventInRemoveIcons = () => {
 
 favoritesContainer.addEventListener("click", AddEventInRemoveIcons);
 // clico na img -> apago elemento de favoritos -> apago da lista
+
+// Remove from favorites button
+
+const removeAllFavorites = () => {
+  favoritList = [];
+  localStorage.setItem("favorite", JSON.stringify(favoritList));
+  printSerieInFavoritesList();
+};
+
+const removeBtn = document.querySelector("#btn-remove-favotites");
+
+removeBtn.addEventListener("click", removeAllFavorites);

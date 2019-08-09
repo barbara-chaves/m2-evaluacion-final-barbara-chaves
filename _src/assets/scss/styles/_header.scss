@@ -1,0 +1,12 @@
+.header {
+  text-align: center;
+  .page-title {
+    font-family: $titleFontFamily;
+    font-size: 3rem;
+  }
+  .page-subtitle {
+    font-size: 2rem;
+    font-family: $subtitleFontFamily;
+    font-weight: 200;
+  }
+}
