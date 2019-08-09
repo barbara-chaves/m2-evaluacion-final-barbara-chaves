@@ -83,6 +83,7 @@ const printSerieInFavoritesList = () => {
   for (const serie of favoritList) {
     const newFavorite = document.createElement("li");
     newFavorite.innerHTML = serie.element;
+    document.querySelector(".favorites").appendChild(newFavorite);
   }
 };
 
