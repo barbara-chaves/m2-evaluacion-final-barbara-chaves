@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+    
+    <head>
+        <meta charset="UTF-8" />
+        <title>Buscador de series</title>
+        <link rel="stylesheet" href="assets/css/main.css"
+        />
+    </head>
+    
+    <body>
+        <header class="header">
+             <h1 class="page-title">
+    Buscador de series
+  </h1>
+
+            <p class="page-subtitle">Encuentra tus series favoritas</p>
+        </header>
+        <main class="main">
+            <div class="wrap">
+                <section class="search">
+                    <form action="#" class="form">
+                        <label for="getUserInput" class="search-label">Buscador de series</label>
+                        <input type="text" id="search-input" placeholder="nombre de la serie"
+                        />
+                        <input class="btn" type="button" id="btn-input" value="Buscar" />
+                    </form>
+                </section>
+                <section class="favorites">
+                     <h2 class="favorites-title">Mis series favoritas</h2>
+
+                    <ul class="favorites-list"></ul>
+                    <input class="btn" type="button" id="btn-remove-favotites" value="Borrar favoritos"
+                    />
+                </section>
+            </div>
+            <section class="result">
+                <ul class="result-list"></ul>
+            </section>
+        </main>
+        <script src="./assets/js/main.js"></script>
+    </body>
+
+</html>
