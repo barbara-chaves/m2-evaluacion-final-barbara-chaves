@@ -2,87 +2,79 @@
 
 // ---RESULT LIST
 
-let searchSerie = "";
+let userInput = "";
+
 const getUserInput = () => {
-  const userInput = document.querySelector("#search-input");
-  return (searchSerie = userInput.value);
+  userInput = document.querySelector("#search-input");
+  return userInput;
 };
 
 let dataList = [];
 
-const getDataFromServer = () => {
-  fetch(`http://api.tvmaze.com/search/shows?q=${searchSerie}`)
-    .then(response => response.json())
-    .then(data => {
-      saveData(data);
-      printResultSeries();
-    });
-};
-
-const setSerieAsFavorite = () => {
-    for (const serie of dataList) {
-      for (let fav = 0; fav < favoritList.length; fav++) {
-        if (serie.id === favoritList[fav].id) {
-          serie.favorite = true;
-        }
-      }
-    }
-};
-
-
 const saveData = data => {
   for (const serie of data) {
+    dataList.push({
+      name: serie.show.name,
+      id: serie.show.id,
+    });
     if (serie.show.image) {
-      dataList.push({
-        name: serie.show.name,
-        id: serie.show.id,
-        image: serie.show.image.medium,
-        favorite: false
-      });
+      serie.image = serie.show.image.medium;
     } else {
-      dataList.push({
-        name: serie.show.name,
-        id: serie.show.id,
-        image: `https://via.placeholder.com/210x295/ffffff/666666/?text=${serie.show.name}`,
-        favorite: false
-      });
+      serie.image = `https://via.placeholder.com/210x295/ffffff/666666/?text=${serie.show.name}`;
     }
   }
   return dataList;
 };
-
-const printResultSeries = () => {
-  setSerieAsFavorite();
-  if (dataList) {
-    for (const serie of dataList) {
-      createResultElements(serie);
-    }
-  }
-};
-
 const resultUL = document.querySelector(".result-list");
 
-const createResultElements = serie => {
+
+const createResultElements = (serie, container) => {
   const newResult = document.createElement("li");
   newResult.classList.add("result-list-item");
   newResult.dataset.id = serie.id;
-  if (serie.favorite) {
-    newResult.classList.add("js-favorite");
+
+  const newResultTitle = `<h3 class="result-list-item-title"> ${serie.name}</h3>`;
+
+  let newResultImg;
+  if (serie.image){
+    newResultImg = `<img class="result-list-item-img" src="${serie.image.medium}">`;
+  } else {
+    newResultImg = `<img class="result-list-item-img" src="https://via.placeholder.com/210x295/ffffff/666666/?text=${serie.name}"`;
   }
-  newResult.dataset.index = serie.id;
-  const newResultTitle = `<h3 class="result-list-item-title"> ${
-    serie.name
-  }</h3>`;
-  let newResultImg = "";
-  newResultImg = `<img class="result-list-item-img" src="${serie.image}">`;
+
   newResult.innerHTML = newResultImg + newResultTitle;
-  resultUL.appendChild(newResult);
+  container.appendChild(newResult);
 };
 
 const deletResultList = () => {
-  dataList = [];
   resultUL.innerHTML = '';
 };
+const printResultSeries = (data) => {
+  // setSerieAsFavorite();
+  for (const serie of data) {
+    createResultElements(serie.show, resultUL);
+  }
+};
+
+const getDataFromServer = () => {
+  fetch(`http://api.tvmaze.com/search/shows?q=${userInput.value}`)
+    .then(response => response.json())
+    .then(data => {
+
+      printResultSeries(data);
+    });
+};
+
+// const setSerieAsFavorite = () => {
+//   for (const serie of dataList) {
+//     for (let fav = 0; fav < favoritList.length; fav++) {
+//       if (serie.id === favoritList[fav].id) {
+//         serie.favorite = true;
+//       }
+//     }
+//   }
+// };
+
 
 const searchBtn = document.querySelector("#btn-input");
 const handleBtnClick = () => {
@@ -96,71 +88,80 @@ searchBtn.addEventListener("click", handleBtnClick);
 // ---FAVORITES
 
 let favoritList = JSON.parse(localStorage.getItem("favorite")) || [];
-let favoritesContainer = [];
+let favoritesContainer = document.querySelector(".favorites-list");
 
 const printSerieInFavoritesList = () => {
-  favoritesContainer = document.querySelector(".favorites-list");
-  favoritesContainer.innerHTML = "";
-  if (JSON.parse(localStorage.getItem("favorite"))) {
-    favoritList = JSON.parse(localStorage.getItem("favorite"));
-    for (const serie of favoritList) {
-      const newFavorite = document.createElement("li");
-      newFavorite.classList.add("favorites-list-item");
-      newFavorite.dataset.id = serie.id;
-      newFavorite.innerHTML =
-        serie.element +
-        "<img  id='remove-img' src='./assets/images/remove-favorite-img.png' alt=''>";
-      favoritesContainer.appendChild(newFavorite);
-    }
+  if (favoritList.length > 0){
+    // console.log('favoritList is not empty');
+    createResultElements(favoritList[0], favoritesContainer);
+    const favoritesLength = favoritesContainer.children.length - 1;
+    favoritesContainer.children[favoritesLength].classList.replace('result-list-item', 'favorites-list-item');
   }
 };
-printSerieInFavoritesList();
 
-const addSerieOnFavorites = resultI => {
-  dataList[resultI].element = resultListItems[resultI].innerHTML;
-  dataList[resultI].favorite = true;
-  favoritList.push(dataList[resultI]);
-  localStorage.setItem("favorite", JSON.stringify(favoritList));
+// printSerieInFavoritesList();
+
+const printAllFavoriteSeries = () => {
+  for (const serie of favoritList){
+    createResultElements(serie, favoritesContainer);
+  }
 };
-const removeSerieFromFavories = resultI => {
+
+printAllFavoriteSeries();
+
+const addSerieOnFavorites = event => {
+  favoritList.unshift({
+    name: event.currentTarget.lastChild.innerHTML,
+    id: event.currentTarget.dataset.id,
+    image: {medium: event.currentTarget.firstElementChild.src}
+  });
+  localStorage.setItem('favorite', JSON.stringify(favoritList));
+};
+
+const removeSerieFromFavories = serie => {
   for (let favIndex = 0; favIndex < favoritList.length; favIndex++) {
-    if (favoritList[favIndex].id === dataList[resultI].id) {
+    if (serie  === ].id) {
       favoritList.splice(favoritList.indexOf(favoritList[favIndex]), 1);
     }
   }
-  dataList[resultI].favorite = false;
   localStorage.setItem("favorite", JSON.stringify(favoritList));
 };
 
 let resultListItems = [];
-
 const saveSerieInlocal = event => {
-  for (let resultI = 0; resultI < resultListItems.length; resultI++) {
-    if (resultListItems[resultI] === event.currentTarget) {
-      if (dataList[resultI].favorite) {
-        removeSerieFromFavories(resultI);
+  if (favoritList.length > 0){
+    for (let i = 0; i < favoritList.length; i++) {
+      if (favoritList[i].id === event.currentTarget.dataset.id) {
+        removeSerieFromFavories(favoritList[i]);
+        console.log('Im already in favorites');
       } else {
-        addSerieOnFavorites(resultI);
+        addSerieOnFavorites(event);
+        printSerieInFavoritesList();
+        console.log('Im not in favorites');
       }
     }
+  } else{
+    addSerieOnFavorites(event);
+    printSerieInFavoritesList();
   }
   return favoritList;
 };
 
-const changeSerieBG = () => {
-  for (let i = 0; i < dataList.length; i++) {
-    if (dataList[i].favorite) {
-      resultListItems[i].classList.add("js-favorite");
-    } else {
-      resultListItems[i].classList.remove("js-favorite");
-    }
-  }
-};
+// const changeSerieBG = () => {
+//   for (let i = 0; i < dataList.length; i++) {
+//     if (dataList[i].favorite) {
+//       resultListItems[i].classList.add("js-favorite");
+//     } else {
+//       resultListItems[i].classList.remove("js-favorite");
+//     }
+//   }
+// };
 
 const handleListClick = event => {
   saveSerieInlocal(event);
-  printSerieInFavoritesList();
-  changeSerieBG();
+  // addSerieOnFavorites(event);
+  // printSerieInFavoritesList();
+  // changeSerieBG();
 };
 
 const addEventInResultItems = () => {
@@ -210,7 +211,6 @@ favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
 
 const removeFavoriteClass = () => {
   for(let i = 0; i < resultListItems.length; i++){
-    console.log(resultListItems[i]);
     resultListItems[i].classList.remove('js-favorite');
   }
 };
