@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 "use strict";
 
 // ---RESULT LIST
@@ -20,13 +21,13 @@ const getDataFromServer = () => {
 };
 
 const setSerieAsFavorite = () => {
-    for (const serie of dataList) {
-      for (let fav = 0; fav < favoritList.length; fav++) {
-        if (serie.id === favoritList[fav].id) {
-          serie.favorite = true;
-        }
+  for (const serie of dataList) {
+    for (let fav = 0; fav < favoritList.length; fav++) {
+      if (serie.id === favoritList[fav].id) {
+        serie.favorite = true;
       }
     }
+  }
 };
 
 
@@ -37,14 +38,16 @@ const saveData = data => {
         name: serie.show.name,
         id: serie.show.id,
         image: serie.show.image.medium,
-        favorite: false
+        favorite: false,
+        genres: serie.show.genres
       });
     } else {
       dataList.push({
         name: serie.show.name,
         id: serie.show.id,
         image: `https://via.placeholder.com/210x295/ffffff/666666/?text=${serie.show.name}`,
-        favorite: false
+        favorite: false,
+        genres: serie.show.genres
       });
     }
   }
@@ -75,7 +78,13 @@ const createResultElements = serie => {
   }</h3>`;
   let newResultImg = "";
   newResultImg = `<img class="result-list-item-img" src="${serie.image}">`;
-  newResult.innerHTML = newResultImg + newResultTitle;
+  let newResultGenres = `<ul class="result-list-item-genres">`;
+  for (const genre of serie.genres){
+    let newLi = `<li>${genre}</li>`;
+    newResultGenres = newResultGenres + newLi;
+  }
+  newResultGenres = newResultGenres + '</ul>';
+  newResult.innerHTML = newResultImg + newResultTitle + newResultGenres;
   resultUL.appendChild(newResult);
 };
 
@@ -210,7 +219,6 @@ favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
 
 const removeFavoriteClass = () => {
   for(let i = 0; i < resultListItems.length; i++){
-    console.log(resultListItems[i]);
     resultListItems[i].classList.remove('js-favorite');
   }
 };
