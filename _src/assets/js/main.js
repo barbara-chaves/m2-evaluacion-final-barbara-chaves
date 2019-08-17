@@ -32,23 +32,17 @@ const setSerieAsFavorite = () => {
 
 
 const saveData = data => {
-  for (const serie of data) {
-    if (serie.show.image) {
-      dataList.push({
-        name: serie.show.name,
-        id: serie.show.id,
-        image: serie.show.image.medium,
-        favorite: false,
-        genres: serie.show.genres
-      });
+  for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
+    dataList.push({
+      name: data[dataIndex].show.name,
+      id: data[dataIndex].show.id,
+      favorite: false,
+      genres: data[dataIndex].show.genres
+    });
+    if (data[dataIndex].show.image) {
+      dataList[dataIndex].image = data[dataIndex].show.image.medium;
     } else {
-      dataList.push({
-        name: serie.show.name,
-        id: serie.show.id,
-        image: `https://via.placeholder.com/210x295/ffffff/666666/?text=${serie.show.name}`,
-        favorite: false,
-        genres: serie.show.genres
-      });
+      dataList[dataIndex].image = `https://via.placeholder.com/210x295/ffffff/666666/?text=${data[dataIndex].show.name}`;
     }
   }
   return dataList;
