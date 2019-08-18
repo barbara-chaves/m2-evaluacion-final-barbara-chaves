@@ -20,10 +20,15 @@ const saveData = data => {
     });
     if (data[dataIndex].show.image) {
       dataList[dataIndex].image = data[dataIndex].show.image.medium;
+      dataList[dataIndex].fullImage = data[dataIndex].show.image.original;
     } else {
       dataList[dataIndex].image = `https://via.placeholder.com/210x295/ffffff/666666/?text=${
         data[dataIndex].show.name
       }`;
+      dataList[dataIndex].fullImage = `https://via.placeholder.com/210x295/ffffff/666666/?text=${
+        data[dataIndex].show.name
+      }`;
+
     }
   }
   return dataList;
@@ -74,7 +79,8 @@ const getDataFromServer = () => {
     .then(data => {
       saveData(data);
       printResultSeries();
-    });
+    })
+    .then(() => addEventinResultImages());
 };
 
 const deletResultList = () => {
@@ -214,3 +220,19 @@ const removeBtn = document.querySelector("#btn-remove-favotites");
 
 removeBtn.addEventListener("click", handleRemoveFavoritesBTNClick);
 
+/// Big image funcion 
+
+const handleImageClick = event => {
+  for (const data of dataList){
+    if (event.currentTarget.parentElement.dataset.id == data.id){
+      window.open(data.fullImage, '_blank');
+    }
+  }
+};
+
+const addEventinResultImages = () => {
+  const resultImages = document.querySelectorAll('.result-list-item-img');
+  for (const image of resultImages){
+    image.addEventListener('click', handleImageClick);
+  }
+};
