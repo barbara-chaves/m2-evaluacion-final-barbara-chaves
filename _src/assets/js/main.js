@@ -20,15 +20,15 @@ const getDataFromServer = () => {
     });
 };
 
-const setSerieAsFavorite = () => {
-  for (const serie of dataList) {
-    for (let fav = 0; fav < favoritList.length; fav++) {
-      if (serie.id === favoritList[fav].id) {
-        serie.favorite = true;
-      }
-    }
-  }
-};
+// const setSerieAsFavorite = () => {
+//   for (const serie of dataList) {
+//     for (let fav = 0; fav < favoritList.length; fav++) {
+//       if (serie.id === favoritList[fav].id) {
+//         serie.favorite = true;
+//       }
+//     }
+//   }
+// };
 
 
 const saveData = data => {
@@ -36,7 +36,7 @@ const saveData = data => {
     dataList.push({
       name: data[dataIndex].show.name,
       id: data[dataIndex].show.id,
-      favorite: false,
+      // favorite: false,
       genres: data[dataIndex].show.genres
     });
     if (data[dataIndex].show.image) {
@@ -49,7 +49,7 @@ const saveData = data => {
 };
 
 const printResultSeries = () => {
-  setSerieAsFavorite();
+  // setSerieAsFavorite();
   if (dataList) {
     for (const serie of dataList) {
       createResultElements(serie);
@@ -63,9 +63,9 @@ const createResultElements = serie => {
   const newResult = document.createElement("li");
   newResult.classList.add("result-list-item");
   newResult.dataset.id = serie.id;
-  if (serie.favorite) {
-    newResult.classList.add("js-favorite");
-  }
+  // if (serie.favorite) {
+  //   newResult.classList.add("js-favorite");
+  // }
   newResult.dataset.index = serie.id;
   const newResultTitle = `<h3 class="result-list-item-title"> ${
     serie.name
@@ -98,132 +98,143 @@ searchBtn.addEventListener("click", handleBtnClick);
 
 // ---FAVORITES
 
-let favoritList = JSON.parse(localStorage.getItem("favorite")) || [];
+let favoritesList = JSON.parse(localStorage.getItem("favorite")) || [];
 let favoritesContainer = [];
 
-const printSerieInFavoritesList = () => {
-  favoritesContainer = document.querySelector(".favorites-list");
-  favoritesContainer.innerHTML = "";
-  if (JSON.parse(localStorage.getItem("favorite"))) {
-    favoritList = JSON.parse(localStorage.getItem("favorite"));
-    for (const serie of favoritList) {
-      const newFavorite = document.createElement("li");
-      newFavorite.classList.add("favorites-list-item");
-      newFavorite.dataset.id = serie.id;
-      newFavorite.innerHTML =
-        serie.element +
-        "<img  id='remove-img' src='./assets/images/remove-favorite-img.png' alt=''>";
-      favoritesContainer.appendChild(newFavorite);
-    }
-  }
-};
-printSerieInFavoritesList();
-
-const addSerieOnFavorites = resultI => {
-  dataList[resultI].element = resultListItems[resultI].innerHTML;
-  dataList[resultI].favorite = true;
-  favoritList.push(dataList[resultI]);
-  localStorage.setItem("favorite", JSON.stringify(favoritList));
-};
-const removeSerieFromFavories = resultI => {
-  for (let favIndex = 0; favIndex < favoritList.length; favIndex++) {
-    if (favoritList[favIndex].id === dataList[resultI].id) {
-      favoritList.splice(favoritList.indexOf(favoritList[favIndex]), 1);
-    }
-  }
-  dataList[resultI].favorite = false;
-  localStorage.setItem("favorite", JSON.stringify(favoritList));
-};
-
-let resultListItems = [];
-
-const saveSerieInlocal = event => {
-  for (let resultI = 0; resultI < resultListItems.length; resultI++) {
-    if (resultListItems[resultI] === event.currentTarget) {
-      if (dataList[resultI].favorite) {
-        removeSerieFromFavories(resultI);
-      } else {
-        addSerieOnFavorites(resultI);
-      }
-    }
-  }
-  return favoritList;
-};
-
-const changeSerieBG = () => {
-  for (let i = 0; i < dataList.length; i++) {
-    if (dataList[i].favorite) {
-      resultListItems[i].classList.add("js-favorite");
-    } else {
-      resultListItems[i].classList.remove("js-favorite");
-    }
+const saveSerieInFavoritesList = (event) => {
+  if(favoritesList.includes(event.currentTarget)){
+    favoritesList.splice(favoritesList.indexOf(event.currentTarget), 1);
+    console.log('Im a favorit already');
+  } else {
+    console.log('Im not a favorite yet');
+    favoritesList.push(event.currentTarget);
   }
 };
 
-const handleListClick = event => {
-  saveSerieInlocal(event);
-  printSerieInFavoritesList();
-  changeSerieBG();
+// const printSerieInFavoritesList = () => {
+//   favoritesContainer = document.querySelector(".favorites-list");
+//   favoritesContainer.innerHTML = "";
+//   if (JSON.parse(localStorage.getItem("favorite"))) {
+//     favoritList = JSON.parse(localStorage.getItem("favorite"));
+//     for (const serie of favoritList) {
+//       const newFavorite = document.createElement("li");
+//       newFavorite.classList.add("favorites-list-item");
+//       newFavorite.dataset.id = serie.id;
+//       newFavorite.innerHTML =
+//         serie.element +
+//         "<img  id='remove-img' src='./assets/images/remove-favorite-img.png' alt=''>";
+//       favoritesContainer.appendChild(newFavorite);
+//     }
+//   }
+// };
+// printSerieInFavoritesList();
+
+// const addSerieOnFavorites = resultI => {
+//   dataList[resultI].element = resultListItems[resultI].innerHTML;
+//   dataList[resultI].favorite = true;
+//   favoritList.push(dataList[resultI]);
+//   localStorage.setItem("favorite", JSON.stringify(favoritList));
+// };
+// const removeSerieFromFavories = resultI => {
+//   for (let favIndex = 0; favIndex < favoritList.length; favIndex++) {
+//     if (favoritList[favIndex].id === dataList[resultI].id) {
+//       favoritList.splice(favoritList.indexOf(favoritList[favIndex]), 1);
+//     }
+//   }
+//   dataList[resultI].favorite = false;
+//   localStorage.setItem("favorite", JSON.stringify(favoritList));
+// };
+
+// let resultListItems = [];
+
+// const saveSerieInlocal = event => {
+//   for (let resultI = 0; resultI < resultListItems.length; resultI++) {
+//     if (resultListItems[resultI] === event.currentTarget) {
+//       if (dataList[resultI].favorite) {
+//         removeSerieFromFavories(resultI);
+//       } else {
+//         addSerieOnFavorites(resultI);
+//       }
+//     }
+//   }
+//   return favoritList;
+// };
+
+// const changeSerieBG = () => {
+//   for (let i = 0; i < dataList.length; i++) {
+//     if (dataList[i].favorite) {
+//       resultListItems[i].classList.add("js-favorite");
+//     } else {
+//       resultListItems[i].classList.remove("js-favorite");
+//     }
+//   }
+// };
+
+const handleResultListClick = event => {
+  saveSerieInFavoritesList(event);
+  // saveSerieInlocal(event);
+  // printSerieInFavoritesList();
+  // changeSerieBG();
 };
 
 const addEventInResultItems = () => {
-  resultListItems = document.querySelectorAll(".result-list-item");
+  const resultListItems = document.querySelectorAll(".result-list-item");
   for (const item of resultListItems) {
-    item.addEventListener("click", handleListClick);
+    item.addEventListener("click", handleResultListClick);
   }
 };
 
 const main = document.querySelector(".main");
 main.addEventListener("mouseover", addEventInResultItems);
 
-// REMOVE FAVORITE
+// // REMOVE FAVORITE
 
-let favoritesItems = document.querySelectorAll(".favorites-list-item");
+// let favoritesItems = document.querySelectorAll(".favorites-list-item");
 
-const removeAnImageFromFavoriteList = event => {
-  for (let i = 0; i < favoritList.length; i++) {
-    if (favoritList[i].id === parseInt(event.currentTarget.parentElement.dataset.id)) {
-      for (let dataIndex = 0; dataIndex < dataList.length; dataIndex++){
-        if (dataList[dataIndex].id === favoritList[i].id) {
-          dataList[dataIndex].favorite = false;
-        }
-      }
-      favoritList.splice(i, 1);
-    }
-  }
-  localStorage.setItem("favorite", JSON.stringify(favoritList));
-};
+// const removeAnImageFromFavoriteList = event => {
+//   for (let i = 0; i < favoritList.length; i++) {
+//     if (favoritList[i].id === parseInt(event.currentTarget.parentElement.dataset.id)) {
+//       for (let dataIndex = 0; dataIndex < dataList.length; dataIndex++){
+//         if (dataList[dataIndex].id === favoritList[i].id) {
+//           dataList[dataIndex].favorite = false;
+//         }
+//       }
+//       favoritList.splice(i, 1);
+//     }
+//   }
+//   localStorage.setItem("favorite", JSON.stringify(favoritList));
+// };
 
-const handleRemoveImgClick = event => {
-  removeAnImageFromFavoriteList(event);
-  printSerieInFavoritesList();
-  changeSerieBG();
-};
+// const handleRemoveImgClick = event => {
+//   removeAnImageFromFavoriteList(event);
+//   printSerieInFavoritesList();
+//   changeSerieBG();
+// };
 
-const AddEventInRemoveIcons = () => {
-  const xImgs = document.querySelectorAll("#remove-img");
-  for (const images of xImgs) {
-    images.addEventListener("click", handleRemoveImgClick);
-  }
-};
+// const AddEventInRemoveIcons = () => {
+//   const xImgs = document.querySelectorAll("#remove-img");
+//   for (const images of xImgs) {
+//     images.addEventListener("click", handleRemoveImgClick);
+//   }
+// };
 
-favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
+// favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
 
-// Remove from favorites button
+// // Remove from favorites button
 
-const removeFavoriteClass = () => {
-  for(let i = 0; i < resultListItems.length; i++){
-    resultListItems[i].classList.remove('js-favorite');
-  }
-};
+// const removeFavoriteClass = () => {
+//   for(let i = 0; i < resultListItems.length; i++){
+//     resultListItems[i].classList.remove('js-favorite');
+//   }
+// };
 
-const handleRemoveFavoritesBTNClick = () => {
-  removeFavoriteClass();
-  favoritList = [];
-  favoritesContainer.innerHTML = '';
-  localStorage.setItem("favorite", JSON.stringify(favoritList));
-};
+// const handleRemoveFavoritesBTNClick = () => {
+//   removeFavoriteClass();
+//   favoritList = [];
+//   favoritesContainer.innerHTML = '';
+//   localStorage.setItem("favorite", JSON.stringify(favoritList));
+// };
 
-const removeBtn = document.querySelector("#btn-remove-favotites");
+// const removeBtn = document.querySelector("#btn-remove-favotites");
 
-removeBtn.addEventListener("click", handleRemoveFavoritesBTNClick);
+// removeBtn.addEventListener("click", handleRemoveFavoritesBTNClick);
