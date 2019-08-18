@@ -16,15 +16,12 @@ const saveData = data => {
     dataList.push({
       name: data[dataIndex].show.name,
       id: data[dataIndex].show.id,
-      // favorite: false,
       genres: data[dataIndex].show.genres
     });
     if (data[dataIndex].show.image) {
       dataList[dataIndex].image = data[dataIndex].show.image.medium;
     } else {
-      dataList[
-        dataIndex
-      ].image = `https://via.placeholder.com/210x295/ffffff/666666/?text=${
+      dataList[dataIndex].image = `https://via.placeholder.com/210x295/ffffff/666666/?text=${
         data[dataIndex].show.name
       }`;
     }
@@ -35,8 +32,8 @@ const saveData = data => {
 const resultUL = document.querySelector(".result-list");
 
 const addFavClass = (serie, newResult) => {
-  for (const fav of favoritesList){
-    if (serie.id === parseInt(fav.id)){
+  for (const fav of favoritesList) {
+    if (serie.id === parseInt(fav.id)) {
       newResult.classList.add("js-favorite");
     }
   }
@@ -99,19 +96,25 @@ searchBtn.addEventListener("click", handleBtnClick);
 let favoritesList = JSON.parse(localStorage.getItem("favorite")) || [];
 let favoritesContainer = [];
 
+const generateNewFavElem = serie => {
+  const newFavorite = document.createElement("li");
+  newFavorite.classList.add("favorites-list-item");
+  newFavorite.dataset.id = serie.id;
+  newFavorite.innerHTML =
+    serie.element +
+    "<img  id='remove-img' src='./assets/icons/close.svg' alt='remove this serie from favorites'>";
+  newFavorite.removeChild(newFavorite.children[2]);
+  newFavorite.firstElementChild.classList.replace('result-list-item-img', 'favorites-list-item-img');
+  favoritesContainer.appendChild(newFavorite);
+};
+
 const printSerieInFavoritesList = () => {
   favoritesContainer = document.querySelector(".favorites-list");
   favoritesContainer.innerHTML = "";
   if (JSON.parse(localStorage.getItem("favorite"))) {
     favoritesList = JSON.parse(localStorage.getItem("favorite"));
     for (const serie of favoritesList) {
-      const newFavorite = document.createElement("li");
-      newFavorite.classList.add("favorites-list-item");
-      newFavorite.dataset.id = serie.id;
-      newFavorite.innerHTML =
-        serie.element +
-        "<img  id='remove-img' src='./assets/images/remove-favorite-img.png' alt=''>";
-      favoritesContainer.appendChild(newFavorite);
+      generateNewFavElem(serie);
     }
   }
 };
@@ -140,13 +143,14 @@ const saveSerieInlocal = event => {
   return favoritesList;
 };
 
-const changeSerieBG = (event) => event.currentTarget.classList.add("js-favorite");
+const changeSerieBG = event => event.currentTarget.classList.add("js-favorite");
 
 const handleResultListClick = event => {
   saveSerieInlocal(event);
   printSerieInFavoritesList();
   changeSerieBG(event);
 };
+
 const addEventInResultItems = () => {
   resultListItems = document.querySelectorAll(".result-list-item");
   for (const item of resultListItems) {
@@ -159,7 +163,6 @@ const main = document.querySelector(".main");
 main.addEventListener("mouseover", addEventInResultItems);
 
 // REMOVE FAVORITE
-
 const removeFromFavoriteList = event => {
   for (let i = 0; i < favoritesList.length; i++) {
     if (favoritesList[i].id === event.currentTarget.parentElement.dataset.id) {
@@ -169,10 +172,18 @@ const removeFromFavoriteList = event => {
   localStorage.setItem("favorite", JSON.stringify(favoritesList));
 };
 
+const removeSerieBG = event => {
+  for (const result of resultListItems){
+    if(result.dataset.id === event.currentTarget.parentElement.dataset.id){
+      result.classList.remove('js-favorite');
+    }
+  }
+};
+
 const handleRemoveImgClick = event => {
   removeFromFavoriteList(event);
   printSerieInFavoritesList();
-  changeSerieBG(event);
+  removeSerieBG(event);
 };
 
 const AddEventInRemoveIcons = () => {
@@ -187,18 +198,19 @@ favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
 // Remove from favorites button
 
 const removeFavoriteClass = () => {
-  for(let i = 0; i < resultListItems.length; i++){
-    resultListItems[i].classList.remove('js-favorite');
+  for (let i = 0; i < resultListItems.length; i++) {
+    resultListItems[i].classList.remove("js-favorite");
   }
 };
 
 const handleRemoveFavoritesBTNClick = () => {
   removeFavoriteClass();
   favoritesList = [];
-  favoritesContainer.innerHTML = '';
+  favoritesContainer.innerHTML = "";
   localStorage.setItem("favorite", JSON.stringify(favoritesList));
 };
 
 const removeBtn = document.querySelector("#btn-remove-favotites");
 
 removeBtn.addEventListener("click", handleRemoveFavoritesBTNClick);
+
