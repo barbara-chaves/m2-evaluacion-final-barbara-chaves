@@ -11,25 +11,6 @@ const getUserInput = () => {
 
 let dataList = [];
 
-const getDataFromServer = () => {
-  fetch(`http://api.tvmaze.com/search/shows?q=${searchSerie}`)
-    .then(response => response.json())
-    .then(data => {
-      saveData(data);
-      printResultSeries();
-    });
-};
-
-// const setSerieAsFavorite = () => {
-//   for (const serie of dataList) {
-//     for (let fav = 0; fav < favoritesList.length; fav++) {
-//       if (serie.id === favoritesList[fav].id) {
-//         serie.favorite = true;
-//       }
-//     }
-//   }
-// };
-
 const saveData = data => {
   for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
     dataList.push({
@@ -51,24 +32,20 @@ const saveData = data => {
   return dataList;
 };
 
-const printResultSeries = () => {
-  // setSerieAsFavorite();
-  if (dataList) {
-    for (const serie of dataList) {
-      createResultElements(serie);
+const resultUL = document.querySelector(".result-list");
+
+const addFavClass = (serie, newResult) => {
+  for (const fav of favoritesList){
+    if (serie.id === parseInt(fav.id)){
+      newResult.classList.add("js-favorite");
     }
   }
 };
-
-const resultUL = document.querySelector(".result-list");
 
 const createResultElements = serie => {
   const newResult = document.createElement("li");
   newResult.classList.add("result-list-item");
   newResult.dataset.id = serie.id;
-  // if (serie.favorite) {
-  //   newResult.classList.add("js-favorite");
-  // }
   newResult.dataset.index = serie.id;
   const newResultTitle = `<h3 class="result-list-item-title"> ${
     serie.name
@@ -82,7 +59,25 @@ const createResultElements = serie => {
   }
   newResultGenres = newResultGenres + "</ul>";
   newResult.innerHTML = newResultImg + newResultTitle + newResultGenres;
+  addFavClass(serie, newResult);
   resultUL.appendChild(newResult);
+};
+
+const printResultSeries = () => {
+  if (dataList) {
+    for (const serie of dataList) {
+      createResultElements(serie);
+    }
+  }
+};
+
+const getDataFromServer = () => {
+  fetch(`http://api.tvmaze.com/search/shows?q=${searchSerie}`)
+    .then(response => response.json())
+    .then(data => {
+      saveData(data);
+      printResultSeries();
+    });
 };
 
 const deletResultList = () => {
@@ -145,20 +140,12 @@ const saveSerieInlocal = event => {
   return favoritesList;
 };
 
-const changeSerieBG = () => {
-  for (let i = 0; i < dataList.length; i++) {
-    if (dataList[i].favorite) {
-      resultListItems[i].classList.add("js-favorite");
-    } else {
-      resultListItems[i].classList.remove("js-favorite");
-    }
-  }
-};
+const changeSerieBG = (event) => event.currentTarget.classList.add("js-favorite");
 
 const handleResultListClick = event => {
   saveSerieInlocal(event);
   printSerieInFavoritesList();
-  changeSerieBG();
+  changeSerieBG(event);
 };
 const addEventInResultItems = () => {
   resultListItems = document.querySelectorAll(".result-list-item");
@@ -171,54 +158,47 @@ const addEventInResultItems = () => {
 const main = document.querySelector(".main");
 main.addEventListener("mouseover", addEventInResultItems);
 
-// // REMOVE FAVORITE
+// REMOVE FAVORITE
 
-// let favoritesItems = document.querySelectorAll(".favorites-list-item");
+const removeFromFavoriteList = event => {
+  for (let i = 0; i < favoritesList.length; i++) {
+    if (favoritesList[i].id === event.currentTarget.parentElement.dataset.id) {
+      favoritesList.splice(i, 1);
+    }
+  }
+  localStorage.setItem("favorite", JSON.stringify(favoritesList));
+};
 
-// const removeAnImageFromFavoriteList = event => {
-//   for (let i = 0; i < favoritesList.length; i++) {
-//     if (favoritesList[i].id === parseInt(event.currentTarget.parentElement.dataset.id)) {
-//       for (let dataIndex = 0; dataIndex < dataList.length; dataIndex++){
-//         if (dataList[dataIndex].id === favoritesList[i].id) {
-//           dataList[dataIndex].favorite = false;
-//         }
-//       }
-//       favoritesList.splice(i, 1);
-//     }
-//   }
-//   localStorage.setItem("favorite", JSON.stringify(favoritesList));
-// };
+const handleRemoveImgClick = event => {
+  removeFromFavoriteList(event);
+  printSerieInFavoritesList();
+  changeSerieBG(event);
+};
 
-// const handleRemoveImgClick = event => {
-//   removeAnImageFromFavoriteList(event);
-//   printSerieInFavoritesList();
-//   changeSerieBG();
-// };
+const AddEventInRemoveIcons = () => {
+  const xImgs = document.querySelectorAll("#remove-img");
+  for (const images of xImgs) {
+    images.addEventListener("click", handleRemoveImgClick);
+  }
+};
 
-// const AddEventInRemoveIcons = () => {
-//   const xImgs = document.querySelectorAll("#remove-img");
-//   for (const images of xImgs) {
-//     images.addEventListener("click", handleRemoveImgClick);
-//   }
-// };
+favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
 
-// favoritesContainer.addEventListener("mouseover", AddEventInRemoveIcons);
+// Remove from favorites button
 
-// // Remove from favorites button
+const removeFavoriteClass = () => {
+  for(let i = 0; i < resultListItems.length; i++){
+    resultListItems[i].classList.remove('js-favorite');
+  }
+};
 
-// const removeFavoriteClass = () => {
-//   for(let i = 0; i < resultListItems.length; i++){
-//     resultListItems[i].classList.remove('js-favorite');
-//   }
-// };
+const handleRemoveFavoritesBTNClick = () => {
+  removeFavoriteClass();
+  favoritesList = [];
+  favoritesContainer.innerHTML = '';
+  localStorage.setItem("favorite", JSON.stringify(favoritesList));
+};
 
-// const handleRemoveFavoritesBTNClick = () => {
-//   removeFavoriteClass();
-//   favoritesList = [];
-//   favoritesContainer.innerHTML = '';
-//   localStorage.setItem("favorite", JSON.stringify(favoritesList));
-// };
+const removeBtn = document.querySelector("#btn-remove-favotites");
 
-// const removeBtn = document.querySelector("#btn-remove-favotites");
-
-// removeBtn.addEventListener("click", handleRemoveFavoritesBTNClick);
+removeBtn.addEventListener("click", handleRemoveFavoritesBTNClick);
