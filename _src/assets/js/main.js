@@ -22,14 +22,13 @@ const getDataFromServer = () => {
 
 // const setSerieAsFavorite = () => {
 //   for (const serie of dataList) {
-//     for (let fav = 0; fav < favoritList.length; fav++) {
-//       if (serie.id === favoritList[fav].id) {
+//     for (let fav = 0; fav < favoritesList.length; fav++) {
+//       if (serie.id === favoritesList[fav].id) {
 //         serie.favorite = true;
 //       }
 //     }
 //   }
 // };
-
 
 const saveData = data => {
   for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
@@ -42,7 +41,11 @@ const saveData = data => {
     if (data[dataIndex].show.image) {
       dataList[dataIndex].image = data[dataIndex].show.image.medium;
     } else {
-      dataList[dataIndex].image = `https://via.placeholder.com/210x295/ffffff/666666/?text=${data[dataIndex].show.name}`;
+      dataList[
+        dataIndex
+      ].image = `https://via.placeholder.com/210x295/ffffff/666666/?text=${
+        data[dataIndex].show.name
+      }`;
     }
   }
   return dataList;
@@ -73,18 +76,18 @@ const createResultElements = serie => {
   let newResultImg = "";
   newResultImg = `<img class="result-list-item-img" src="${serie.image}">`;
   let newResultGenres = `<ul class="result-list-item-genres">`;
-  for (const genre of serie.genres){
+  for (const genre of serie.genres) {
     let newLi = `<li>${genre}</li>`;
     newResultGenres = newResultGenres + newLi;
   }
-  newResultGenres = newResultGenres + '</ul>';
+  newResultGenres = newResultGenres + "</ul>";
   newResult.innerHTML = newResultImg + newResultTitle + newResultGenres;
   resultUL.appendChild(newResult);
 };
 
 const deletResultList = () => {
   dataList = [];
-  resultUL.innerHTML = '';
+  resultUL.innerHTML = "";
 };
 
 const searchBtn = document.querySelector("#btn-input");
@@ -101,87 +104,68 @@ searchBtn.addEventListener("click", handleBtnClick);
 let favoritesList = JSON.parse(localStorage.getItem("favorite")) || [];
 let favoritesContainer = [];
 
-const saveSerieInFavoritesList = (event) => {
-  if(favoritesList.includes(event.currentTarget)){
-    favoritesList.splice(favoritesList.indexOf(event.currentTarget), 1);
-    console.log('Im a favorit already');
-  } else {
-    console.log('Im not a favorite yet');
-    favoritesList.push(event.currentTarget);
+const printSerieInFavoritesList = () => {
+  favoritesContainer = document.querySelector(".favorites-list");
+  favoritesContainer.innerHTML = "";
+  if (JSON.parse(localStorage.getItem("favorite"))) {
+    favoritesList = JSON.parse(localStorage.getItem("favorite"));
+    for (const serie of favoritesList) {
+      const newFavorite = document.createElement("li");
+      newFavorite.classList.add("favorites-list-item");
+      newFavorite.dataset.id = serie.id;
+      newFavorite.innerHTML =
+        serie.element +
+        "<img  id='remove-img' src='./assets/images/remove-favorite-img.png' alt=''>";
+      favoritesContainer.appendChild(newFavorite);
+    }
+  }
+};
+printSerieInFavoritesList();
+
+const addSerieOnFavorites = event => {
+  favoritesList.push({
+    id: event.currentTarget.dataset.id,
+    element: event.currentTarget.innerHTML
+  });
+  localStorage.setItem("favorite", JSON.stringify(favoritesList));
+};
+
+let resultListItems = [];
+
+const saveSerieInlocal = event => {
+  let favorite = false;
+  for (const favSerie of favoritesList) {
+    if (favSerie.id === event.currentTarget.dataset.id) {
+      favorite = true;
+    }
+  }
+  if (favorite === false) {
+    addSerieOnFavorites(event);
+  }
+  return favoritesList;
+};
+
+const changeSerieBG = () => {
+  for (let i = 0; i < dataList.length; i++) {
+    if (dataList[i].favorite) {
+      resultListItems[i].classList.add("js-favorite");
+    } else {
+      resultListItems[i].classList.remove("js-favorite");
+    }
   }
 };
 
-// const printSerieInFavoritesList = () => {
-//   favoritesContainer = document.querySelector(".favorites-list");
-//   favoritesContainer.innerHTML = "";
-//   if (JSON.parse(localStorage.getItem("favorite"))) {
-//     favoritList = JSON.parse(localStorage.getItem("favorite"));
-//     for (const serie of favoritList) {
-//       const newFavorite = document.createElement("li");
-//       newFavorite.classList.add("favorites-list-item");
-//       newFavorite.dataset.id = serie.id;
-//       newFavorite.innerHTML =
-//         serie.element +
-//         "<img  id='remove-img' src='./assets/images/remove-favorite-img.png' alt=''>";
-//       favoritesContainer.appendChild(newFavorite);
-//     }
-//   }
-// };
-// printSerieInFavoritesList();
-
-// const addSerieOnFavorites = resultI => {
-//   dataList[resultI].element = resultListItems[resultI].innerHTML;
-//   dataList[resultI].favorite = true;
-//   favoritList.push(dataList[resultI]);
-//   localStorage.setItem("favorite", JSON.stringify(favoritList));
-// };
-// const removeSerieFromFavories = resultI => {
-//   for (let favIndex = 0; favIndex < favoritList.length; favIndex++) {
-//     if (favoritList[favIndex].id === dataList[resultI].id) {
-//       favoritList.splice(favoritList.indexOf(favoritList[favIndex]), 1);
-//     }
-//   }
-//   dataList[resultI].favorite = false;
-//   localStorage.setItem("favorite", JSON.stringify(favoritList));
-// };
-
-// let resultListItems = [];
-
-// const saveSerieInlocal = event => {
-//   for (let resultI = 0; resultI < resultListItems.length; resultI++) {
-//     if (resultListItems[resultI] === event.currentTarget) {
-//       if (dataList[resultI].favorite) {
-//         removeSerieFromFavories(resultI);
-//       } else {
-//         addSerieOnFavorites(resultI);
-//       }
-//     }
-//   }
-//   return favoritList;
-// };
-
-// const changeSerieBG = () => {
-//   for (let i = 0; i < dataList.length; i++) {
-//     if (dataList[i].favorite) {
-//       resultListItems[i].classList.add("js-favorite");
-//     } else {
-//       resultListItems[i].classList.remove("js-favorite");
-//     }
-//   }
-// };
-
 const handleResultListClick = event => {
-  saveSerieInFavoritesList(event);
-  // saveSerieInlocal(event);
-  // printSerieInFavoritesList();
-  // changeSerieBG();
+  saveSerieInlocal(event);
+  printSerieInFavoritesList();
+  changeSerieBG();
 };
-
 const addEventInResultItems = () => {
-  const resultListItems = document.querySelectorAll(".result-list-item");
+  resultListItems = document.querySelectorAll(".result-list-item");
   for (const item of resultListItems) {
     item.addEventListener("click", handleResultListClick);
   }
+  return resultListItems;
 };
 
 const main = document.querySelector(".main");
@@ -192,17 +176,17 @@ main.addEventListener("mouseover", addEventInResultItems);
 // let favoritesItems = document.querySelectorAll(".favorites-list-item");
 
 // const removeAnImageFromFavoriteList = event => {
-//   for (let i = 0; i < favoritList.length; i++) {
-//     if (favoritList[i].id === parseInt(event.currentTarget.parentElement.dataset.id)) {
+//   for (let i = 0; i < favoritesList.length; i++) {
+//     if (favoritesList[i].id === parseInt(event.currentTarget.parentElement.dataset.id)) {
 //       for (let dataIndex = 0; dataIndex < dataList.length; dataIndex++){
-//         if (dataList[dataIndex].id === favoritList[i].id) {
+//         if (dataList[dataIndex].id === favoritesList[i].id) {
 //           dataList[dataIndex].favorite = false;
 //         }
 //       }
-//       favoritList.splice(i, 1);
+//       favoritesList.splice(i, 1);
 //     }
 //   }
-//   localStorage.setItem("favorite", JSON.stringify(favoritList));
+//   localStorage.setItem("favorite", JSON.stringify(favoritesList));
 // };
 
 // const handleRemoveImgClick = event => {
@@ -230,9 +214,9 @@ main.addEventListener("mouseover", addEventInResultItems);
 
 // const handleRemoveFavoritesBTNClick = () => {
 //   removeFavoriteClass();
-//   favoritList = [];
+//   favoritesList = [];
 //   favoritesContainer.innerHTML = '';
-//   localStorage.setItem("favorite", JSON.stringify(favoritList));
+//   localStorage.setItem("favorite", JSON.stringify(favoritesList));
 // };
 
 // const removeBtn = document.querySelector("#btn-remove-favotites");
